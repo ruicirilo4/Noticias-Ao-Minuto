@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Meu leitor RSS</title>
+	<script src="https://unpkg.com/rss-parser/dist/rss-parser.min.js"></script>
+
+	<style>
+		#rss-feed {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 20px;
+		}
+
+		#rss-feed div {
+			width: calc(33.33% - 20px);
+			background-color: #fff;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+			overflow: hidden;
+		}
+
+		#rss-feed img {
+			width: 100%;
+			height: 150px;
+			object-fit: cover;
+		}
+
+		#rss-feed h2 {
+			margin: 10px;
+			font-size: 1.2rem;
+		}
+
+		#rss-feed p {
+			margin: 10px;
+			font-size: 0.8rem;
+			color: #666;
+		}
+
+		#rss-feed a {
+			display: block;
+			margin: 10px;
+			padding: 5px;
+			text-align: center;
+			font-size: 0.9rem;
+			color: #fff;
+			background-color: #007bff;
+			border-radius: 5px;
+			text-decoration: none;
+			transition: all 0.2s ease-in-out;
+		}
+
+		#rss-feed a:hover {
+			background-color: #0056b3;
+			color: #fff;
+		}
+	</style>
+</head>
+<body>
+	<center><h1>Noticias Ao Minuto</h1></center>
+	<div id="rss-feed"></div>
+	<script>
+		// Habilitar CORS (Cross-Origin Resource Sharing)
+		const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+
+		// Criar um objeto de parser RSS
+		const parser = new RSSParser();
+
+		// Extrair informações do feed RSS
+		parser.parseURL(CORS_PROXY + 'https://www.noticiasaominuto.com/rss/ultima-hora', function(err, feed) {
+			if (err) throw err;
+
+			// Exibir as informações do feed na página
+			const feedContainer = document.getElementById('rss-feed');
+			feed.items.forEach(function(entry) {
+				const article = document.createElement('div');
+
+				// Exibir o conteúdo do item do feed
+				article.innerHTML = `
+				<img src="${entry.enclosure.url || entry['media:content'][0].url || 'https://via.placeholder.com/150'}" />
+				<h2>${entry.title}</h2>
+				<p>${new Date(entry.isoDate).toLocaleString()}</p>
+				<a href="${entry.link}">Ler mais</a>
+				`;
+				feedContainer.appendChild(article);
+			});
+		});
+	</script>
+</body>
+</html>
