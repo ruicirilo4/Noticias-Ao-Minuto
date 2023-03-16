@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Meu leitor RSS</title>
+  <style>
+
+#rss-feed {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+#rss-feed div {
+  width: calc(33.33% - 20px);
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+#rss-feed img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+#rss-feed h2 {
+  margin: 10px;
+  font-size: 1.2rem;
+}
+
+#rss-feed p {
+  margin: 10px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+#rss-feed a {
+  display: block;
+  margin: 10px;
+  padding: 5px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+#rss-feed a:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+
+</style>
+  </head>
+  <body>
+    <center><h1>Notícias ao Minuto</h1></center>
+    <div id="rss-feed"></div>
+
+    <script>
+      // Criar um objeto XMLHttpRequest
+      const xhr = new XMLHttpRequest();
+
+      // Configurar o objeto para fazer uma requisição GET para o feed RSS
+      xhr.open(
+        "GET",
+        "https://api.rss2json.com/v1/api.json?rss_url=https://www.noticiasaominuto.com/rss/ultima-hora&api_key=36vkyefajtemeunatvuxyud59n3hq0tomyzcetjr"
+      );
+
+      // Definir a função de callback para processar a resposta da requisição
+      xhr.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+          // Converter o JSON da resposta em um objeto JavaScript
+          const response = JSON.parse(this.responseText);
+
+          // Exibir as informações do feed na página
+          const feedContainer = document.getElementById("rss-feed");
+          response.items.forEach(function (entry) {
+            const article = document.createElement("div");
+            const pubDate = new Date(entry.pubDate);
+
+            // Exibir a imagem do item do feed (se houver)
+            let imageUrl = "";
+            if (entry.enclosure !== undefined) {
+              imageUrl = entry.enclosure.link;
+            } else if (
+              entry["media:content"] !== undefined &&
+              entry["media:content"].length > 0
+            ) {
+              imageUrl = entry["media:content"][0].url;
+            }
+
+            // Exibir as informações do item do feed
+            article.innerHTML = `
+              <img src="${imageUrl}" />
+              <h2>${entry.title}</h2>
+              <p>${entry.categories[0]} - ${
+              pubDate.getMonth() + 1
+            }/${pubDate.getDate()}/${pubDate.getFullYear()} ${pubDate.getHours()}:${pubDate.getMinutes()}</p>
+              
+              <a href="${entry.link}">Ler mais</a>
+            `;
+            feedContainer.appendChild(article);
+          });
+        }
+      };
+
+      // Enviar a requisição
+      xhr.send();
+    </script>
+  </body>
+</html>
+
+
